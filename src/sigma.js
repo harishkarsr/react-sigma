@@ -2,15 +2,14 @@ import React, { FC, useEffect } from "react";
 
 import "@react-sigma/core/lib/react-sigma.min.css";
 import { MultiDirectedGraph } from "graphology";
-import { SigmaContainer, useLoadGraph, useRegisterEvents, SearchControl, ControlsContainer } from "@react-sigma/core";
-import data from './response.json'
+import { SigmaContainer, useLoadGraph, useRegisterEvents, SearchControl, ControlsContainer, ZoomControl, FullScreenControl } from "@react-sigma/core";
+import data from './response1.json'
 import { useWorkerLayoutForceAtlas2 } from "@react-sigma/layout-forceatlas2";
 
 const SigmaComponent = () => {
   const MyGraph= () => {
     const loadGraph = useLoadGraph();
     const registerEvents = useRegisterEvents();
-    console.log(data)
     const finalData = []
     const { start, kill, isRunning } = useWorkerLayoutForceAtlas2({ settings: { slowDown: 10 } });
 
@@ -32,14 +31,14 @@ const SigmaComponent = () => {
             finalData.push(innerElement)
         })
     });
-    console.log(finalData)
+    // console.log(finalData)
     const getColor=(type)=>{
         switch (type) {
-            case 'Organization':
+            case 'Movie':
                 return "brown"        
-            case 'Startup':
+            case '':
                 return "blue"        
-            case 'User':
+            case 'Person':
                 return "#19a83d"        
             default:
                 break;
@@ -49,12 +48,12 @@ const SigmaComponent = () => {
     useEffect(() => {
         registerEvents({
             // node events
-            clickNode: (event) => console.log("clickNode", event.event, event.node, event.preventSigmaDefault),
+            clickNode: (event) => console.log("clickNode", event),
             doubleClickNode: (event) => console.log("doubleClickNode", event.event, event.node, event.preventSigmaDefault),
             rightClickNode: (event) => console.log("rightClickNode", event.event, event.node, event.preventSigmaDefault),
             // wheelNode: (event) => console.log("wheelNode", event.event, event.node, event.preventSigmaDefault),
             downNode: (event) => console.log("downNode", event.event, event.node, event.preventSigmaDefault),
-            // enterNode: (event) => console.log("enterNode", event.node),
+            enterNode: (event) => console.log("enterNode", event.node),
             // leaveNode: (event) => console.log("leaveNode", event.node),
             // edge events
             clickEdge: (event) => console.log("clickEdge", event.event, event.edge, event.preventSigmaDefault),
@@ -73,7 +72,7 @@ const SigmaComponent = () => {
             // default mouse events
             click: (event) => console.log("click", event.x, event.y),
             doubleClick: (event) => console.log("doubleClick", event.x, event.y),
-            // wheel: (event) => console.log("wheel", event.x, event.y, event.delta),
+            wheel: (event) => console.log("wheel", event.x, event.y, event.delta),
             // rightClick: (event) => console.log("rightClick", event.x, event.y),
             // mouseup: (event) => console.log("mouseup", event.x, event.y),
             // mousedown: (event) => console.log("mousedown", event.x, event.y),
@@ -96,7 +95,7 @@ const SigmaComponent = () => {
         if(!element.startNodeElementId && !element.endNodeElementId){
             console.log(identity.low, identity.high)
             if(!elementIds.includes(elementId)){
-                graph.addNode(elementId, { x: identity.low, y: identity.high, label: properties.name, size: 20,color:getColor(labels[0])  });
+                graph.addNode(elementId, { x: identity.low, y: identity.high, label: properties.name||properties.title, size: 10,color:getColor(labels[0])  });
                 elementIds.push(elementId)
             }
         }
@@ -104,13 +103,14 @@ const SigmaComponent = () => {
       finalData.forEach(element => {
         const {elementId, identity, properties, startNodeElementId, endNodeElementId, type} = element
         if(element.startNodeElementId && element.endNodeElementId){
-            graph.addEdgeWithKey(elementId, startNodeElementId, endNodeElementId, { label: type });
+            graph.addEdgeWithKey(elementId, startNodeElementId, endNodeElementId, { multi:false,label: type, GraphType:"directed" });
+            // graph.multi(true)
         }
       })
       graph.forEachNode((node) => {
         graph.mergeNodeAttributes(node, {
-          x: Math.random() ,
-          y: Math.random() 
+          x: Math.random()*1 ,
+          y: Math.random()*1        
         });
       });
       loadGraph(graph);
@@ -120,8 +120,28 @@ const SigmaComponent = () => {
   };
 
   return (
-    <SigmaContainer style={{ height: "500px" }}>
+    <SigmaContainer graph={MultiDirectedGraph} settings={{
+        // nodeProgramClasses: { image: getNodeProgramImage() },
+        // defaultEdgeType: "arrow",
+        renderEdgeLabels:true,
+        // labelDensity: 0.07,
+        // labelGridCellSize: 60,
+        // labelRenderedSizeThreshold: 15,
+        // labelFont: "Lato, sans-serif",
+        // zIndex: true,
+        // edgeReducer:(edge, data) =>{
+        //     if (true && !graph.hasExtremity(edge, true)) {
+        //         return true;
+        //       }
+            
+        //       if (state.suggestions && (!state.suggestions.has(graph.source(edge)) || !state.suggestions.has(graph.target(edge)))) {
+        //         return true;
+        //       } 
+        // }     
+      }} style={{height:"500px"}}>
+      <ZoomControl />
       <MyGraph />
+        <FullScreenControl />
       <ControlsContainer position={"top-right"}>
         <SearchControl style={{ width: "200px" }} />
       </ControlsContainer>
