@@ -4,26 +4,26 @@ import "@react-sigma/core/lib/react-sigma.min.css";
 import { MultiDirectedGraph } from "graphology";
 import { SigmaContainer, useLoadGraph, useRegisterEvents, SearchControl, ControlsContainer, ZoomControl, FullScreenControl } from "@react-sigma/core";
 import data from './response1.json'
-import { useWorkerLayoutForceAtlas2 } from "@react-sigma/layout-forceatlas2";
+// import { useWorkerLayoutForceAtlas2 } from "@react-sigma/layout-forceatlas2";
+import { LayoutForceAtlas2Control } from "@react-sigma/layout-forceatlas2";
 
 const SigmaComponent = () => {
   const MyGraph= () => {
     const loadGraph = useLoadGraph();
     const registerEvents = useRegisterEvents();
     const finalData = []
-    const { start, kill, isRunning } = useWorkerLayoutForceAtlas2({ settings: { slowDown: 10 } });
 
-    useEffect(() => {
-      // start FA2
-      start();
-      setTimeout(() => {
-        kill()
-      }, 100);
-      return () => {
-        // Kill FA2 on unmount
-        kill();
-      };
-    }, [start, kill]);
+    // useEffect(() => {
+    //   // start FA2
+    //   start();
+    //   setTimeout(() => {
+    //     kill()
+    //   }, 100);
+    //   return () => {
+    //     // Kill FA2 on unmount
+    //     kill();
+    //   };
+    // }, [start, kill]);
     data.forEach(element => {
         // console.log(element._fields)
         element?._fields.forEach(innerElement =>{
@@ -48,7 +48,7 @@ const SigmaComponent = () => {
     useEffect(() => {
         registerEvents({
             // node events
-            clickNode: (event) => console.log("clickNode", event),
+            clickNode: (event) => console.log("clickNode", event.event, event.node, event.preventSigmaDefault),
             doubleClickNode: (event) => console.log("doubleClickNode", event.event, event.node, event.preventSigmaDefault),
             rightClickNode: (event) => console.log("rightClickNode", event.event, event.node, event.preventSigmaDefault),
             // wheelNode: (event) => console.log("wheelNode", event.event, event.node, event.preventSigmaDefault),
@@ -138,10 +138,14 @@ const SigmaComponent = () => {
         //         return true;
         //       } 
         // }     
-      }} style={{height:"500px"}}>
-      <ZoomControl />
+      }} style={{ height: "100vh" }}>
       <MyGraph />
+      <ZoomControl />
+      <ControlsContainer position={"bottom-right"}>
+        <ZoomControl />
         <FullScreenControl />
+        <LayoutForceAtlas2Control />
+      </ControlsContainer>
       <ControlsContainer position={"top-right"}>
         <SearchControl style={{ width: "200px" }} />
       </ControlsContainer>
