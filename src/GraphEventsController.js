@@ -16,11 +16,7 @@ const GraphEventsController = ({ setHoveredNode, children }) => {
    */
   useEffect(() => {
     registerEvents({
-      clickNode({ node }) {
-        if (!graph.getNodeAttribute(node, "hidden")) {
-          window.open(graph.getNodeAttribute(node, "URL"), "_blank");
-        }
-      },
+      
       enterNode({ node }) {
         setHoveredNode(node);
         // TODO: Find a better way to get the DOM mouse layer:
