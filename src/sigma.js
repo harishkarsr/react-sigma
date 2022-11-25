@@ -1,4 +1,4 @@
-import React, { FC, useEffect } from "react";
+import React, { FC, useEffect, useState } from "react";
 
 import "@react-sigma/core/lib/react-sigma.min.css";
 import { MultiDirectedGraph } from "graphology";
@@ -6,6 +6,8 @@ import { SigmaContainer, useLoadGraph, useRegisterEvents, SearchControl, Control
 import data from './response1.json'
 // import { useWorkerLayoutForceAtlas2 } from "@react-sigma/layout-forceatlas2";
 import { LayoutForceAtlas2Control } from "@react-sigma/layout-forceatlas2";
+import Modal from 'react-bootstrap/Modal';
+import Button from 'react-bootstrap/Button';
 
 const SigmaComponent = () => {
   const MyGraph= () => {
@@ -48,7 +50,10 @@ const SigmaComponent = () => {
     useEffect(() => {
         registerEvents({
             // node events
-            clickNode: (event) => console.log("clickNode", event.event, event.node, event.preventSigmaDefault),
+            clickNode: (event) => {
+              console.log("clickNode", event.event, event.node, event.preventSigmaDefault)
+              handleShow()
+            },
             doubleClickNode: (event) => console.log("doubleClickNode", event.event, event.node, event.preventSigmaDefault),
             rightClickNode: (event) => console.log("rightClickNode", event.event, event.node, event.preventSigmaDefault),
             // wheelNode: (event) => console.log("wheelNode", event.event, event.node, event.preventSigmaDefault),
@@ -118,7 +123,10 @@ const SigmaComponent = () => {
 
     return null;
   };
+  const [show, setShow] = useState(false);
 
+  const handleClose = () => setShow(false);
+  const handleShow = () => setShow(true);
   return (
     <SigmaContainer graph={MultiDirectedGraph} settings={{
         // nodeProgramClasses: { image: getNodeProgramImage() },
@@ -145,6 +153,26 @@ const SigmaComponent = () => {
         <ZoomControl />
         <FullScreenControl />
         <LayoutForceAtlas2Control />
+        <Modal
+        show={show}
+        onHide={handleClose}
+        backdrop="static"
+        keyboard={false}
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Modal title</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          I will not close if you click outside me. Don't even try to press
+          escape key.
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleClose}>
+            Close
+          </Button>
+          <Button variant="primary">Understood</Button>
+        </Modal.Footer>
+      </Modal>
       </ControlsContainer>
       <ControlsContainer position={"top-right"}>
         <SearchControl style={{ width: "200px" }} />
