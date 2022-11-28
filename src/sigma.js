@@ -13,7 +13,10 @@ import {
 } from "@react-sigma/core";
 import data from "./response1.json";
 // import { useWorkerLayoutForceAtlas2 } from "@react-sigma/layout-forceatlas2";
-import { LayoutForceAtlas2Control, useWorkerLayoutForceAtlas2  } from "@react-sigma/layout-forceatlas2";
+import {
+  LayoutForceAtlas2Control,
+  useLayoutForceAtlas2,
+} from "@react-sigma/layout-forceatlas2";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 import GraphSettingsController from "./GraphSettingsController";
@@ -23,15 +26,7 @@ const SigmaComponent = () => {
     const loadGraph = useLoadGraph();
     const registerEvents = useRegisterEvents();
     const finalData = [];
-    const { start, kill, isRunning } = useWorkerLayoutForceAtlas2({ settings: { slowDown: 1 } });
-    useEffect(() => {
-      // start FA2
-      start();
-      return () => {
-        // Kill FA2 on unmount
-        kill();
-      };
-    }, [start, kill]);
+    const { positions, assign } = useLayoutForceAtlas2();
 
     // useEffect(() => {
     //   // start FA2
@@ -221,32 +216,37 @@ const SigmaComponent = () => {
           // graph.multi(true)
         }
       });
-      if(!localStorage.getItem("nodes")){
-        const nodes =[]
+      if (!localStorage.getItem("nodes")) {
+        const nodes = [];
         graph.forEachNode((node) => {
-          const x=Math.random() * 10
-          const y =Math.random() * 10
+          const x = Math.random() * 10;
+          const y = Math.random() * 10;
           graph.mergeNodeAttributes(node, {
             x,
             y,
           });
-          nodes.push({node, x, y})
+          nodes.push({ node, x, y });
         });
-        localStorage.setItem("nodes", JSON. stringify(nodes))
-      }else {
+        localStorage.setItem("nodes", JSON.stringify(nodes));
+      } else {
         const nodes = JSON.parse(localStorage["nodes"]);
         graph.forEachNode((node, attributes) => {
-          const index = nodes.findIndex((item) => item.node===node);
-          graph.mergeNodeAttributes(node, { x: nodes[index].x, y: nodes[index].y });
-        })
+          const index = nodes.findIndex((item) => item.node === node);
+          graph.mergeNodeAttributes(node, {
+            x: nodes[index].x,
+            y: nodes[index].y,
+          });
+        });
       }
       loadGraph(graph);
+      assign();
+      console.log(positions());
     }, []);
 
     return null;
   };
   const [show, setShow] = useState(false);
-  const [hoveredNode, setHoveredNode] = useState(null)
+  const [hoveredNode, setHoveredNode] = useState(null);
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
@@ -274,8 +274,8 @@ const SigmaComponent = () => {
       }}
       style={{ height: "100vh" }}
     >
-      {/* <GraphSettingsController hoveredNode={hoveredNode} />
-      <GraphEventsController setHoveredNode={setHoveredNode} /> */}
+      <GraphSettingsController hoveredNode={hoveredNode} />
+      <GraphEventsController setHoveredNode={setHoveredNode} />
 
       <MyGraph />
       <ZoomControl />
