@@ -17,6 +17,7 @@ import {
   LayoutForceAtlas2Control,
   useLayoutForceAtlas2,
 } from "@react-sigma/layout-forceatlas2";
+import {useLayoutNoverlap} from '@react-sigma/layout-noverlap'
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 import GraphSettingsController from "./GraphSettingsController";
@@ -26,7 +27,8 @@ const SigmaComponent = () => {
     const loadGraph = useLoadGraph();
     const registerEvents = useRegisterEvents();
     const finalData = [];
-    const { positions, assign } = useLayoutForceAtlas2();
+    // const { positions, assign } = useLayoutForceAtlas2();
+    const { positions, assign } = useLayoutNoverlap();
 
     // useEffect(() => {
     //   // start FA2
