@@ -17,7 +17,7 @@ const GraphEventsController = ({ setHoveredNode, children }) => {
   useEffect(() => {
     registerEvents({
       
-      enterNode({ node }) {
+      enterNode(node ) {
         setHoveredNode(node);
         // TODO: Find a better way to get the DOM mouse layer:
         const mouseLayer = getMouseLayer();
