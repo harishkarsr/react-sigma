@@ -21,7 +21,7 @@ const GraphSettingsController= ({ children, hoveredNode }) => {
    */
   useEffect(() => {
     sigma.setSetting("hoverRenderer", (context, data, settings) =>{
-      console.log(context, data, settings)
+      // console.log(context, data, settings)
       drawHover(context, { ...sigma.getNodeDisplayData(data.label), ...data }, settings)}
     );
   }, [sigma, graph]);

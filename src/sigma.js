@@ -13,7 +13,7 @@ import {
 } from "@react-sigma/core";
 import data from "./response1.json";
 // import { useWorkerLayoutForceAtlas2 } from "@react-sigma/layout-forceatlas2";
-import { LayoutForceAtlas2Control } from "@react-sigma/layout-forceatlas2";
+import { LayoutForceAtlas2Control, useWorkerLayoutForceAtlas2  } from "@react-sigma/layout-forceatlas2";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 import GraphSettingsController from "./GraphSettingsController";
@@ -23,7 +23,16 @@ const SigmaComponent = () => {
     const loadGraph = useLoadGraph();
     const registerEvents = useRegisterEvents();
     const finalData = [];
-   
+    const { start, kill, isRunning } = useWorkerLayoutForceAtlas2({ settings: { slowDown: 1 } });
+    useEffect(() => {
+      // start FA2
+      start();
+      return () => {
+        // Kill FA2 on unmount
+        kill();
+      };
+    }, [start, kill]);
+
     // useEffect(() => {
     //   // start FA2
     //   start();
@@ -216,7 +225,7 @@ const SigmaComponent = () => {
         const nodes =[]
         graph.forEachNode((node) => {
           const x=Math.random() * 10
-          const y =Math.random() * 10 
+          const y =Math.random() * 10
           graph.mergeNodeAttributes(node, {
             x,
             y,
@@ -229,12 +238,10 @@ const SigmaComponent = () => {
         graph.forEachNode((node, attributes) => {
           const index = nodes.findIndex((item) => item.node===node);
           graph.mergeNodeAttributes(node, { x: nodes[index].x, y: nodes[index].y });
-          
-          console.log(graph.getAttribute(nodes[index].node))
         })
       }
       loadGraph(graph);
-    }, [loadGraph]);
+    }, []);
 
     return null;
   };
@@ -267,15 +274,15 @@ const SigmaComponent = () => {
       }}
       style={{ height: "100vh" }}
     >
-      <GraphSettingsController hoveredNode={hoveredNode} />
-      <GraphEventsController setHoveredNode={setHoveredNode} />
+      {/* <GraphSettingsController hoveredNode={hoveredNode} />
+      <GraphEventsController setHoveredNode={setHoveredNode} /> */}
 
       <MyGraph />
       <ZoomControl />
       <ControlsContainer position={"bottom-right"}>
         <ZoomControl />
-        <FullScreenControl />
         <LayoutForceAtlas2Control />
+        <FullScreenControl />
         <Modal
           show={show}
           onHide={handleClose}
